@@ -21,7 +21,7 @@
         <xalan.version>2.7.1</xalan.version>
         <xerces.version>2.11.0</xerces.version>
         <weld.version>1.1.Final</weld.version>
-        <resteasy.version>2.3.5.Final</resteasy.version>
+        <resteasy.version>3.0.8.Final</resteasy.version>
         <log4j.version>1.2.16</log4j.version>
         <slf4j.version>1.6.4</slf4j.version>
         <j2bugzilla.version>1.4</j2bugzilla.version>
@@ -541,62 +541,6 @@
     </dependencies>
 
     <profiles>
-        <profile>
-            <id>jboss-eap-6.1</id>
-            <properties>
-                <jboss.bom.version>1.0.4.Final</jboss.bom.version>
-                <jboss.spec.verison>3.0.2.Final</jboss.spec.verison>
-                <resteasy.version>2.3.6.Final</resteasy.version>
-            </properties>
-        </profile>
-        <profile>
-            <id>jboss-eap-6.2</id>
-            <properties>
-                <jboss.bom.version>1.0.7.Final</jboss.bom.version>
-                <jboss.spec.verison>3.0.2.Final</jboss.spec.verison>
-                <resteasy.version>2.3.7.Final</resteasy.version>
-            </properties>
-        </profile>
-        <profile>
-            <id>belay</id>
-            <dependencies>
-                <!-- Belay Library -->
-                <dependency>
-                    <groupId>org.jboss.pressgang.belay</groupId>
-                    <artifactId>resource-server-provider</artifactId>
-                    <version>1.0-SNAPSHOT</version>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <!-- When built in OpenShift the 'openshift' profile will be 
-                used when invoking mvn. -->
-            <!-- Use this profile for any OpenShift specific customization 
-                your app will need. -->
-            <!-- By default that is to put the resulting archive into the 
-                'deployments' folder. -->
-            <!-- http://maven.apache.org/guides/mini/guide-building-for-different-environments.html -->
-            <id>openshift</id>
-            <build>
-                <finalName>${project.artifactId}</finalName>
-                <resources>
-                    <resource>
-                        <directory>src/main/resources/META-INF</directory>
-                        <filtering>true</filtering>
-                    </resource>
-                </resources>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-war-plugin</artifactId>
-                        <version>${warplugin.version}</version>
-                        <configuration>
-                            <outputDirectory>deployments</outputDirectory>
-                            <warName>ROOT</warName>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
         <profile>
             <id>test-run</id>
             <properties>
