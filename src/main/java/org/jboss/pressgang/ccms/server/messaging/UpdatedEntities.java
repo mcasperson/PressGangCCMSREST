@@ -76,7 +76,7 @@ public class UpdatedEntities {
     private static final String INITIAL_CONTEXT_FACTORY = "org.jboss.as.naming.InitialContextFactory";
     private static final String URL_PKG_PREFIXES = "org.jboss.naming:org.jnp.interfaces";
     private static final String PROVIDER_URL = "jnp://localhost:1099";
-    private static final String CONNECTION_FACTORY = "/ConnectionFactory";
+    private static final String CONNECTION_FACTORY = "ConnectionFactory";
     /**
      * JNDI name for the JMS topic that will be notified of updated topics
      */
