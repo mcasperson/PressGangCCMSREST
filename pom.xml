@@ -16,6 +16,7 @@
         <pressgang.ccms.version>1.9-SNAPSHOT</pressgang.ccms.version>
         <jboss.bom.version>1.0.3.Final</jboss.bom.version>
         <jboss.spec.verison>3.0.1.Final</jboss.spec.verison>
+        <version.wildfly>8.1.0.Final</version.wildfly>
         <jbossasplugin.version>7.1.1.Final</jbossasplugin.version>
         <jackson.version>1.9.9</jackson.version>
         <xalan.version>2.7.1</xalan.version>
@@ -52,18 +53,11 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.jboss.bom</groupId>
-                <artifactId>jboss-javaee-6.0-with-tools</artifactId>
-                <version>${jboss.bom.version}</version>
-                <type>pom</type>
+                <groupId>org.wildfly.bom</groupId>
+                <artifactId>jboss-javaee-7.0-with-all</artifactId>
+                <version>${version.wildfly}</version>
                 <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.bom</groupId>
-                <artifactId>jboss-javaee-6.0-with-hibernate</artifactId>
-                <version>${jboss.bom.version}</version>
                 <type>pom</type>
-                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.jboss.bom</groupId>
@@ -171,6 +165,12 @@
         </dependency>
 
         <!-- RestEASY Dependencies -->
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>jaxrs-api</artifactId>
+            <version>${resteasy.version}</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxrs</artifactId>
@@ -539,188 +539,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <profiles>
-        <profile>
-            <id>test-run</id>
-            <properties>
-                <jboss.base.dir>${project.build.directory}/jboss</jboss.base.dir>
-                <jboss.dir>${jboss.base.dir}/jboss-as-${jbossarquillian.version}</jboss.dir>
-                <jboss.config.dir>${jboss.dir}/standalone/configuration</jboss.config.dir>
-                <jboss.httpclient.dir>${jboss.dir}/modules/org/apache/httpcomponents/main</jboss.httpclient.dir>
-                <keystore.password>password</keystore.password>
-                <truststore.password>password</truststore.password>
-                <oauth2authserver.project.name>OAuth2AuthServer</oauth2authserver.project.name>
-                <skipIntTests>false</skipIntTests>
-            </properties>
-            <build>
-                <finalName>${project.artifactId}</finalName>
-                <testResources>
-                    <testResource>
-                        <directory>src/test/resources/general</directory>
-                        <filtering>true</filtering>
-                    </testResource>
-                    <testResource>
-                        <directory>src/test/resources/jboss</directory>
-                        <targetPath>${jboss.config.dir}</targetPath>
-                        <filtering>true</filtering>
-                    </testResource>
-                    <testResource>
-                        <directory>src/test/resources/ssl</directory>
-                        <targetPath>${jboss.config.dir}</targetPath>
-                    </testResource>
-                    <testResource>
-                        <directory>src/test/resources/module</directory>
-                        <targetPath>${jboss.httpclient.dir}</targetPath>
-                    </testResource>
-                </testResources>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-jar-plugin</artifactId>
-                        <configuration>
-                            <archive>
-                                <manifestEntries>
-                                    <Dependencies>org.apache.httpcomponents</Dependencies>
-                                </manifestEntries>
-                            </archive>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>unpack-jboss</id>
-                                <phase>generate-test-resources</phase>
-                                <goals>
-                                    <goal>unpack</goal>
-                                </goals>
-                                <configuration>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>org.jboss.as</groupId>
-                                            <artifactId>jboss-as-dist</artifactId>
-                                            <version>${jbossarquillian.version}</version>
-                                            <type>zip</type>
-                                            <overWrite>true</overWrite>
-                                            <outputDirectory>${jboss.base.dir}</outputDirectory>
-                                        </artifactItem>
-                                    </artifactItems>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>get-war</id>
-                                <phase>generate-test-resources</phase>
-                                <goals>
-                                    <goal>copy</goal>
-                                </goals>
-                                <configuration>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>org.jboss.pressgang.belay</groupId>
-                                            <artifactId>auth-server</artifactId>
-                                            <version>1.0-SNAPSHOT</version>
-                                            <type>war</type>
-                                            <overWrite>true</overWrite>
-                                            <destFileName>${oauth2authserver.project.name}.war</destFileName>
-                                        </artifactItem>
-                                    </artifactItems>
-                                    <outputDirectory>${project.build.directory}</outputDirectory>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>deploy-module-fix</id>
-                                <phase>process-test-classes</phase>
-                                <goals>
-                                    <goal>copy</goal>
-                                </goals>
-                                <configuration>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>org.apache.httpcomponents</groupId>
-                                            <artifactId>httpclient</artifactId>
-                                            <version>4.1.1</version>
-                                            <type>jar</type>
-                                            <overWrite>false</overWrite>
-                                        </artifactItem>
-                                    </artifactItems>
-                                    <outputDirectory>${jboss.httpclient.dir}</outputDirectory>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <version>${antrunplugin.version}</version>
-                        <executions>
-                            <execution>
-                                <id>remove-files</id>
-                                <phase>process-test-resources</phase>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                                <configuration>
-                                    <target>
-                                        <!-- JSE configuration will only work if bundled APR libs are removed -->
-                                        <delete dir="${jboss.dir}/modules/org/jboss/as/web/main/lib"/>
-                                    </target>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>add-sql</id>
-                                <phase>process-test-resources</phase>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                                <configuration>
-                                    <target>
-                                        <touch datetime="now">
-                                            <fileset file="${project.build.directory}/test-classes/test-authserver-import.sql"/>
-                                        </touch>
-                                        <war destfile="${project.build.directory}/${oauth2authserver.project.name}.war" update="true">
-                                            <zipfileset file="${project.build.directory}/test-classes/test-authserver-import.sql"
-                                                        fullpath="WEB-INF/classes/import.sql"/>
-                                        </war>
-                                    </target>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>xml-maven-plugin</artifactId>
-                        <version>${xmlplugin.version}</version>
-                        <executions>
-                            <execution>
-                                <phase>process-test-classes</phase>
-                                <goals>
-                                    <goal>transform</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <transformationSets>
-                                <transformationSet>
-                                    <dir>${jboss.config.dir}</dir>
-                                    <includes>
-                                        <include>standalone*.xml</include>
-                                    </includes>
-                                    <outputDir>${jboss.config.dir}</outputDir>
-                                    <stylesheet>${jboss.config.dir}/standalone.xsl</stylesheet>
-                                </transformationSet>
-                            </transformationSets>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-            <dependencies>
-                <!-- Belay Library -->
-                <dependency>
-                    <groupId>org.jboss.pressgang.belay</groupId>
-                    <artifactId>resource-server-provider</artifactId>
-                    <version>1.0-SNAPSHOT</version>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
 </project>

@@ -20,10 +20,13 @@
 package org.jboss.pressgang.ccms.server.interceptor;
 
 import org.jboss.pressgang.ccms.model.config.ApplicationConfig;
+import org.jboss.resteasy.core.Headers;
+import org.jboss.resteasy.core.ServerResponse;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Path;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -33,7 +36,7 @@ import java.util.regex.Pattern;
  * Prevent access to PUT, POST or DELETE methods when the server is readonly.
  */
 @Provider
-public class ReadOnlyInterceptor implements javax.ws.rs.container.ContainerRequestFilter {
+public class ReadOnlyInterceptor implements ContainerRequestFilter {
 
 
     /**
@@ -60,9 +63,9 @@ public class ReadOnlyInterceptor implements javax.ws.rs.container.ContainerReque
             }
 
             if (!exempt) {
-                if (resourceMethod.getMethod() == HttpMethod.PUT ||
-                        resourceMethod.getMethod() == HttpMethod.POST ||
-                        resourceMethod.getMethod() == HttpMethod.DELETE) {
+                if (requestContext.getMethod() == HttpMethod.PUT ||
+                        requestContext.getMethod() == HttpMethod.POST ||
+                        requestContext.getMethod() == HttpMethod.DELETE) {
                     requestContext.abortWith(new ServerResponse("The server is readonly, and forbids all calls to POST, PUT and DELETE endpoints", 403, new Headers<Object>()));
                 }
             }

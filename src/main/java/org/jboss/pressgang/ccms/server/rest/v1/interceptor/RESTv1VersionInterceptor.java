@@ -19,28 +19,24 @@
 
 package org.jboss.pressgang.ccms.server.rest.v1.interceptor;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.ext.Provider;
-import java.lang.reflect.Method;
-import java.util.List;
-
 import org.jboss.pressgang.ccms.rest.v1.constants.RESTv1Constants;
 import org.jboss.pressgang.ccms.rest.v1.jaxrsinterfaces.RESTInterfaceV1;
-import org.jboss.pressgang.ccms.server.rest.v1.RESTv1;
 import org.jboss.pressgang.ccms.utils.common.VersionUtilities;
 import org.jboss.resteasy.annotations.interception.ServerInterceptor;
 import org.jboss.resteasy.core.Headers;
-import org.jboss.resteasy.core.ResourceMethod;
 import org.jboss.resteasy.core.ServerResponse;
-import org.jboss.resteasy.spi.Failure;
-import org.jboss.resteasy.spi.HttpRequest;
-import org.jboss.resteasy.spi.interception.AcceptedByMethod;
-import org.jboss.resteasy.spi.interception.PreProcessInterceptor;
+
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.ext.Provider;
+import java.util.List;
 
 @Provider
 @ServerInterceptor
-public class RESTv1VersionInterceptor implements PreProcessInterceptor, AcceptedByMethod {
+public class RESTv1VersionInterceptor implements ContainerRequestFilter {
+
+
     private static final int UPGRADE_STATUS_CODE = 426;
     private static final String RESTv1_VERSION = VersionUtilities.getAPIVersion(RESTInterfaceV1.class);
     private static final boolean IS_RESTv1_SNAPSHOT = isSnapshotVersion(RESTv1_VERSION);
@@ -53,35 +49,33 @@ public class RESTv1VersionInterceptor implements PreProcessInterceptor, Accepted
             "and no longer compatible. Please update the csprocessor application.";
 
     @Override
-    public ServerResponse preProcess(HttpRequest request, ResourceMethod method) throws Failure, WebApplicationException {
-        if (request != null && request.getHttpHeaders() != null && request.getHttpHeaders().getRequestHeaders() != null) {
-            final HttpHeaders headers = request.getHttpHeaders();
-            if (headers.getRequestHeaders() != null) {
+    public void filter(final ContainerRequestContext requestContext) {
+        //if (RESTv1.class.equals(responseContext.getEntityClass())) {
+            if (requestContext != null && requestContext.getHeaders() != null) {
+                final MultivaluedMap<String, String> headers = requestContext.getHeaders();
+
                 // REST API Version Check
-                final List<String> RESTVersions = headers.getRequestHeader(RESTv1Constants.X_VERSION_HEADER);
+                final List<String> RESTVersions = headers.get(RESTv1Constants.X_VERSION_HEADER);
                 if (RESTVersions != null) {
                     for (final String version : RESTVersions) {
                         if (!isValidVersion(version)) {
-                            return new ServerResponse(REST_VERSION_ERROR_MSG, UPGRADE_STATUS_CODE, new Headers<Object>());
+                            requestContext.abortWith(new ServerResponse(REST_VERSION_ERROR_MSG, UPGRADE_STATUS_CODE, new Headers<Object>()));
                         }
                     }
                 }
 
                 // CSP Version Check
-                final List<String> CSPVersions = headers.getRequestHeader(RESTv1Constants.X_CSP_VERSION_HEADER);
+                final List<String> CSPVersions = headers.get(RESTv1Constants.X_CSP_VERSION_HEADER);
                 if (CSPVersions != null) {
                     for (final String version : CSPVersions) {
                         if (!isValidCSPVersion(version)) {
-                            return new ServerResponse(CSP_VERSION_ERROR_MSG, UPGRADE_STATUS_CODE, new Headers<Object>());
+                            requestContext.abortWith(new ServerResponse(CSP_VERSION_ERROR_MSG, UPGRADE_STATUS_CODE, new Headers<Object>()));
                         }
                     }
                 }
+
             }
-
-            return null;
-        }
-
-        return null;
+        //}
     }
 
     /**
@@ -160,11 +154,5 @@ public class RESTv1VersionInterceptor implements PreProcessInterceptor, Accepted
 
     protected static boolean isUnknownVersion(final String version) {
         return version.toLowerCase().equals("unknown");
-    }
-
-    @Override
-    public boolean accept(Class declaring, Method method) {
-        // Only use this interceptor for v1 endpoints.
-        return RESTv1.class.equals(declaring);
     }
 }

@@ -19,24 +19,25 @@
 
 package org.jboss.pressgang.ccms.server.rest.v1.interceptor;
 
-import javax.ws.rs.Path;
-import javax.ws.rs.ext.Provider;
-
 import org.apache.http.HttpStatus;
 import org.jboss.pressgang.ccms.server.rest.v1.RESTv1;
-import org.jboss.resteasy.annotations.interception.ServerInterceptor;
-import org.jboss.resteasy.core.ServerResponse;
-import org.jboss.resteasy.spi.interception.PostProcessInterceptor;
+
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerResponseContext;
+import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.ext.Provider;
+import java.io.IOException;
 
 @Provider
-@ServerInterceptor
-public class RESTv1CreateResponseInterceptor implements PostProcessInterceptor {
+public class RESTv1CreateResponseInterceptor implements ContainerResponseFilter {
+
     @Override
-    public void postProcess(final ServerResponse response) {
-        if (RESTv1.class.equals(response.getResourceClass()) && HttpStatus.SC_OK == response.getStatus()) {
-            final Path path = response.getResourceMethod().getAnnotation(Path.class);
-            if (path.value().matches("^/\\w+?/create/.*")) {
-                response.setStatus(HttpStatus.SC_CREATED);
+    public void filter(final ContainerRequestContext requestContext,
+                       final ContainerResponseContext responseContext) throws IOException {
+        if (RESTv1.class.equals(responseContext.getEntityClass()) && HttpStatus.SC_OK == responseContext.getStatus()) {
+            final String path = requestContext.getUriInfo().getPath();
+            if (path.matches("^/\\w+?/create/.*")) {
+                responseContext.setStatus(HttpStatus.SC_CREATED);
             }
         }
     }
