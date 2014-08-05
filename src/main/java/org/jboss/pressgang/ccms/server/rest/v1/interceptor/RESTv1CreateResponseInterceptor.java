@@ -36,9 +36,9 @@ public class RESTv1CreateResponseInterceptor implements ContainerResponseFilter 
     @Override
     public void filter(final ContainerRequestContext requestContext,
                        final ContainerResponseContext responseContext) throws IOException {
-        final ResourceMethodInvoker resourceMethodInvoker =  (ResourceMethodInvoker)requestContext.getProperty(Constants.RESOURCE_METHOD_INVOKER_PROPERTY);
+        final ResourceMethodInvoker resourceMethodInvoker = (ResourceMethodInvoker)requestContext.getProperty(Constants.RESOURCE_METHOD_INVOKER_PROPERTY);
 
-        if (RESTv1.class.equals(resourceMethodInvoker.getResourceClass()) && HttpStatus.SC_OK == responseContext.getStatus()) {
+        if (resourceMethodInvoker != null && RESTv1.class.equals(resourceMethodInvoker.getResourceClass()) && HttpStatus.SC_OK == responseContext.getStatus()) {
             final String path = requestContext.getUriInfo().getPath();
             if (path.matches("^/\\w+?/create/.*")) {
                 responseContext.setStatus(HttpStatus.SC_CREATED);

@@ -55,7 +55,7 @@ public class RESTv1VersionInterceptor implements ContainerRequestFilter {
     public void filter(final ContainerRequestContext requestContext) {
         final ResourceMethodInvoker resourceMethodInvoker =  (ResourceMethodInvoker)requestContext.getProperty(Constants.RESOURCE_METHOD_INVOKER_PROPERTY);
 
-        if (RESTv1.class.equals(resourceMethodInvoker.getResourceClass())) {
+        if (resourceMethodInvoker != null && RESTv1.class.equals(resourceMethodInvoker.getResourceClass())) {
             if (requestContext != null && requestContext.getHeaders() != null) {
                 final MultivaluedMap<String, String> headers = requestContext.getHeaders();
 

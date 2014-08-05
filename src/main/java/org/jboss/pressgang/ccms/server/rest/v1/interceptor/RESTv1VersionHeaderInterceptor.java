@@ -40,7 +40,7 @@ public class RESTv1VersionHeaderInterceptor implements ContainerResponseFilter {
                        final ContainerResponseContext responseContext) throws IOException {
         final ResourceMethodInvoker resourceMethodInvoker =  (ResourceMethodInvoker)requestContext.getProperty(Constants.RESOURCE_METHOD_INVOKER_PROPERTY);
 
-        if (RESTv1.class.equals(resourceMethodInvoker.getResourceClass())) {
+        if (resourceMethodInvoker != null && RESTv1.class.equals(resourceMethodInvoker.getResourceClass())) {
             responseContext.getHeaders().add(RESTv1Constants.X_PRESSGANG_VERSION_HEADER, VersionUtilities.getAPIVersion(RESTInterfaceV1.class));
         }
     }
