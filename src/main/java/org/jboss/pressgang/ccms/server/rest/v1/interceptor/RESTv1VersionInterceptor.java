@@ -21,9 +21,12 @@ package org.jboss.pressgang.ccms.server.rest.v1.interceptor;
 
 import org.jboss.pressgang.ccms.rest.v1.constants.RESTv1Constants;
 import org.jboss.pressgang.ccms.rest.v1.jaxrsinterfaces.RESTInterfaceV1;
+import org.jboss.pressgang.ccms.server.constants.Constants;
+import org.jboss.pressgang.ccms.server.rest.v1.RESTv1;
 import org.jboss.pressgang.ccms.utils.common.VersionUtilities;
 import org.jboss.resteasy.annotations.interception.ServerInterceptor;
 import org.jboss.resteasy.core.Headers;
+import org.jboss.resteasy.core.ResourceMethodInvoker;
 import org.jboss.resteasy.core.ServerResponse;
 
 import javax.ws.rs.container.ContainerRequestContext;
@@ -50,7 +53,9 @@ public class RESTv1VersionInterceptor implements ContainerRequestFilter {
 
     @Override
     public void filter(final ContainerRequestContext requestContext) {
-        //if (RESTv1.class.equals(responseContext.getEntityClass())) {
+        final ResourceMethodInvoker resourceMethodInvoker =  (ResourceMethodInvoker)requestContext.getProperty(Constants.RESOURCE_METHOD_INVOKER_PROPERTY);
+
+        if (RESTv1.class.equals(resourceMethodInvoker.getResourceClass())) {
             if (requestContext != null && requestContext.getHeaders() != null) {
                 final MultivaluedMap<String, String> headers = requestContext.getHeaders();
 
@@ -75,7 +80,7 @@ public class RESTv1VersionInterceptor implements ContainerRequestFilter {
                 }
 
             }
-        //}
+        }
     }
 
     /**

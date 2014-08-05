@@ -47,4 +47,9 @@ public class Constants {
      * This is the maximum number of topics to return when finding similar topics
      */
     public static final int MAX_NUMBER_SIMILAR_TOPICS = 100;
+
+    /**
+     * A property of a ContainerRequestContext that retrieves the class that is handling the request.
+     */
+    public static final String RESOURCE_METHOD_INVOKER_PROPERTY = "org.jboss.resteasy.core.ResourceMethodInvoker";
 }
